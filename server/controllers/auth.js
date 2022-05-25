@@ -1,6 +1,23 @@
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const createError = require('http-errors');
 const db = require('../db');
+
+const secret = process.env.JWT_SECRET || 'a';
+
+const createToken = user => {
+    const payload = {
+        user: {
+            id: user.id,
+            username: user.username,
+        },
+    };
+    const options = { expiresIn: 24 * 60 * 60 };
+
+    const token = jwt.sign(payload, secret, options);
+
+    return token;
+};
 
 /**
  * @param {import('express').Request} req
@@ -24,8 +41,11 @@ module.exports.login = async (req, res, next) => {
     const auth = await bcrypt.compare(password, user.password);
     if (!auth) return next(createError(401, 'Incorrect password'));
 
+    const token = createToken(user);
+
     res.json({
         message: 'Login success',
+        token,
     });
 };
 /**

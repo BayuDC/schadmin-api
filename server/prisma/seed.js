@@ -7,7 +7,7 @@ async function main() {
     for (let i = 0; i < 10; i++) {
         await prisma.user.create({
             data: {
-                username: faker.internet.userName(),
+                username: faker.unique(faker.internet.userName),
                 password: '$2b$10$Hm3IPt5xdLKKr/8HfUHWxuemOpDZyikaDBtScq.1GsCTSEGqGTXry', // ? password
             },
         });
