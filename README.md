@@ -1,2 +1,1 @@
-# schadmin
-Something cool
+# SchAdmin
