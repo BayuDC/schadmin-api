@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "dev": "node -r dotenv/config app.js",
+    "db:push": "prisma db push --force-reset",
+    "db:seed": "prisma db seed"
   },
   "author": "BayuDC",
   "repository": {
@@ -12,9 +15,19 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@prisma/client": "^3.14.0",
+    "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.18.1",
     "http-errors": "^2.0.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^7.1.0",
+    "dotenv": "^16.0.1",
+    "prisma": "^3.14.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }
