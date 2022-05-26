@@ -47,7 +47,8 @@ model Teacher {
 
   user    User    @relation(fields: [userId], references: [id])
   subject Subject @relation(fields: [subjectId], references: [id])
-  classes Class[] @relation("teacher_class")
+
+  extend ClassSubjectTeacherLink[]
 
   @@map("teachers")
 }
@@ -60,8 +61,9 @@ model Class {
   majorId Int
 
   students Student[]
-  teachers Teacher[] @relation("teacher_class")
   major    Major     @relation(fields: [majorId], references: [id])
+
+  extend ClassSubjectTeacherLink[]
 
   @@map("classes")
 }
@@ -81,7 +83,22 @@ model Subject {
 
   teachers Teacher[]
 
+  extend ClassSubjectTeacherLink[]
+
   @@map("subjects")
+}
+
+model ClassSubjectTeacherLink {
+  classId   Int @map("class_id")
+  subjectId Int @map("subject_id")
+  teacherId Int @map("teacher_id")
+
+  class   Class   @relation(fields: [classId], references: [id])
+  subject Subject @relation(fields: [subjectId], references: [id])
+  teacher Teacher @relation(fields: [teacherId], references: [id])
+
+  @@id([classId, subjectId, teacherId])
+  @@map("_class_subject_teacher")
 }
 
 enum Role {
