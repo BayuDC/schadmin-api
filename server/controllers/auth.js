@@ -4,10 +4,11 @@ const createError = require('http-errors');
 const db = require('../db');
 
 const secret = process.env.JWT_SECRET || 'a';
+const oneDay = 24 * 60 * 60;
 
 const createToken = user => {
     const payload = { user };
-    const options = { expiresIn: 24 * 60 * 60 };
+    const options = { expiresIn: oneDay };
 
     return jwt.sign(payload, secret, options);
 };
@@ -42,6 +43,7 @@ module.exports.login = async (req, res, next) => {
 
     const token = createToken(user);
 
+    res.cookie('token', token, { httpOnly: true, maxAge: oneDay * 1000 });
     res.status(201).json({
         message: 'Login success',
         user,
