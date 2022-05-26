@@ -14,6 +14,82 @@ model User {
   id       Int    @id @default(autoincrement())
   username String @unique
   password String
+  role     Role
+
+  teacher Teacher?
 
   @@map("users")
+}
+
+model Student {
+  id      Int    @id @default(autoincrement())
+  name    String
+  nis     String @unique @db.Char(5)
+  gender  Gender
+  address String @db.Text
+
+  classId Int @map("class_id")
+
+  class Class @relation(fields: [classId], references: [id])
+
+  @@map("students")
+}
+
+model Teacher {
+  id      Int    @id @default(autoincrement())
+  name    String
+  code    String @unique @db.Char(2)
+  gender  Gender
+  address String @db.Text
+
+  userId    Int @unique @map("user_id")
+  subjectId Int @map("subject_id")
+
+  user    User    @relation(fields: [userId], references: [id])
+  subject Subject @relation(fields: [subjectId], references: [id])
+  classes Class[] @relation("teacher_class")
+
+  @@map("teachers")
+}
+
+model Class {
+  id    Int    @id @default(autoincrement())
+  name  String
+  grade Int
+
+  majorId Int
+
+  students Student[]
+  teachers Teacher[] @relation("teacher_class")
+  major    Major     @relation(fields: [majorId], references: [id])
+
+  @@map("classes")
+}
+
+model Major {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  classes Class[]
+
+  @@map("majors")
+}
+
+model Subject {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  teachers Teacher[]
+
+  @@map("subjects")
+}
+
+enum Role {
+  teacher
+  admin
+}
+
+enum Gender {
+  male
+  female
 }
