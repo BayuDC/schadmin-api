@@ -17,7 +17,11 @@ const createToken = user => {
  * @param {import('express').Response} res
  * @param {import('express').NextFunction} next
  */
-module.exports.me = (req, res, next) => {};
+module.exports.me = (req, res, next) => {
+    res.json({
+        user: req.user,
+    });
+};
 /**
  * @param {import('express').Request} req
  * @param {import('express').Response} res
@@ -38,7 +42,7 @@ module.exports.login = async (req, res, next) => {
 
     const token = createToken(user);
 
-    res.json({
+    res.status(201).json({
         message: 'Login success',
         user,
         token,
