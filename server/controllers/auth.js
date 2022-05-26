@@ -55,4 +55,9 @@ module.exports.login = async (req, res, next) => {
  * @param {import('express').Response} res
  * @param {import('express').NextFunction} next
  */
-module.exports.logout = (req, res, next) => {};
+module.exports.logout = (req, res, next) => {
+    res.cookie('token', '', { maxAge: 0 });
+    res.send({
+        message: 'Logout success',
+    });
+};

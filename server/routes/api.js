@@ -12,7 +12,7 @@ router.get('/', (req, res) => {
 router.get('/auth', authGuard, (req, res) => res.send());
 router.get('/auth/me', authGuard, authController.me);
 router.post('/auth/login', authController.login);
-router.get('/auth/logout', authController.logout);
+router.get('/auth/logout', authGuard, authController.logout);
 
 router.use(errorMiddleware.handle);
 
