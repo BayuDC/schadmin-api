@@ -6,6 +6,22 @@ module.exports = {
      * @param {import('express').Request} req
      * @param {import('express').Response} res
      * @param {import('express').NextFunction} next
+     * @param {string} id
+     */
+    load: async (req, res, next, id) => {
+        const subject = await db.subject.findUnique({
+            where: { id: parseInt(id) },
+        });
+
+        if (!subject) return next(createError(404, 'Subject not found'));
+
+        req.subject = subject;
+        next();
+    },
+    /**
+     * @param {import('express').Request} req
+     * @param {import('express').Response} res
+     * @param {import('express').NextFunction} next
      */
     index: async (req, res, next) => {
         const subjects = await db.subject.findMany();
@@ -18,12 +34,9 @@ module.exports = {
      * @param {import('express').NextFunction} next
      */
     show: async (req, res, next) => {
-        const id = parseInt(req.params.id);
-        const subject = await db.subject.findUnique({
-            where: { id },
+        res.json({
+            subject: req.subject,
         });
-
-        res.json({ subject });
     },
     /**
      * @param {import('express').Request} req
@@ -52,17 +65,10 @@ module.exports = {
      */
     update: async (req, res, next) => {
         try {
-            const id = parseInt(req.params.id);
             const { name } = req.body;
 
-            let subject = await db.subject.findUnique({
-                where: { id },
-            });
-
-            if (!subject) return next(createError(404, 'Subject not found'));
-
-            subject = await db.subject.update({
-                where: { id: subject.id },
+            const subject = await db.subject.update({
+                where: { id: req.subject.id },
                 data: {
                     name,
                 },
@@ -80,16 +86,8 @@ module.exports = {
      */
     delete: async (req, res, next) => {
         try {
-            const id = parseInt(req.params.id);
-
-            let subject = await db.subject.findUnique({
-                where: { id },
-            });
-
-            if (!subject) return next(createError(404, 'Subject not found'));
-
-            subject = await db.subject.delete({
-                where: { id: subject.id },
+            await db.subject.delete({
+                where: { id: req.subject.id },
             });
 
             res.status(204).send();

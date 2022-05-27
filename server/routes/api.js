@@ -9,11 +9,11 @@ const subjectValidation = require('../validations/subject');
 const errorMiddleware = require('../middlewares/error');
 const { auth, authGuard, adminGate } = require('../middlewares/auth');
 
-router.use(auth);
-
 router.get('/', (req, res) => {
     res.json({ message: 'Hello World!' });
 });
+
+router.use(auth);
 
 router.get('/auth', authGuard, (req, res) => res.send());
 router.get('/auth/me', authGuard, authController.me);
@@ -22,11 +22,12 @@ router.get('/auth/logout', authGuard, authController.logout);
 
 router.use(authGuard);
 
+router.param('subjectId', subjectController.load);
 router.get('/subject', subjectController.index);
-router.get('/subject/:id', subjectController.show);
+router.get('/subject/:subjectId', subjectController.show);
 router.post('/subject', adminGate, validate(...subjectValidation), subjectController.store);
-router.put('/subject/:id', adminGate, validate(...subjectValidation), subjectController.update);
-router.delete('/subject/:id', adminGate, subjectController.delete);
+router.put('/subject/:subjectId', adminGate, validate(...subjectValidation), subjectController.update);
+router.delete('/subject/:subjectId', adminGate, subjectController.delete);
 
 router.use(errorMiddleware.handle);
 
