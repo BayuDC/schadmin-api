@@ -39,3 +39,12 @@ module.exports.authGuard = (req, res, next) => {
     if (!req.user) return res.status(401).send();
     next();
 };
+/**
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+module.exports.adminGate = (req, res, next) => {
+    if (req.user.role != 'admin') return res.status(403).send();
+    next();
+};
