@@ -1,7 +1,10 @@
 const router = require('express').Router();
+const { validate } = require('express-validation');
 
 const authController = require('../controllers/auth');
 const subjectController = require('../controllers/subject');
+
+const subjectValidation = require('../validations/subject');
 
 const errorMiddleware = require('../middlewares/error');
 const { auth, authGuard, adminGate } = require('../middlewares/auth');
@@ -21,8 +24,8 @@ router.use(authGuard);
 
 router.get('/subject', subjectController.index);
 router.get('/subject/:id', subjectController.show);
-router.post('/subject', adminGate, subjectController.store);
-router.put('/subject/:id', adminGate, subjectController.update);
+router.post('/subject', adminGate, validate(...subjectValidation), subjectController.store);
+router.put('/subject/:id', adminGate, validate(...subjectValidation), subjectController.update);
 router.delete('/subject/:id', adminGate, subjectController.delete);
 
 router.use(errorMiddleware.handle);
