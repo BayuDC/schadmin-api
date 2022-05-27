@@ -1,4 +1,5 @@
 const { Joi } = require('express-validation');
+const { options, joiOptions } = require('./config');
 
 module.exports = [
     {
@@ -6,13 +7,6 @@ module.exports = [
             name: Joi.string().required(),
         }),
     },
-    {
-        context: true,
-        keyByField: true,
-    },
-    {
-        abortEarly: false,
-        stripUnknown: true,
-        errors: { wrap: { label: '[]' } },
-    },
+    options,
+    joiOptions,
 ];
