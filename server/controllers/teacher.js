@@ -54,4 +54,26 @@ module.exports = {
 
         res.json({ teacher });
     },
+    /**
+     * @param {import('express').Request} req
+     * @param {import('express').Response} res
+     * @param {import('express').NextFunction} next
+     */
+    async store(req, res, next) {
+        try {
+            const { name, code, gender, address, userId, subjectId } = req.body;
+
+            const teacher = await db.teacher.create({
+                data: {
+                    ...{ name, code, gender, address },
+                    user: { connect: { id: parseInt(userId) } },
+                    subject: { connect: { id: parseInt(subjectId) } },
+                },
+            });
+
+            res.status(201).json({ teacher });
+        } catch (err) {
+            next(createError(400, err.message));
+        }
+    },
 };

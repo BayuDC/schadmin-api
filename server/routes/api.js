@@ -33,6 +33,7 @@ router.delete('/subject/:subjectId', adminGate, subjectController.delete);
 router.param('teacherId', teacherController.load);
 router.get('/teacher', teacherController.index);
 router.get('/teacher/:teacherId', teacherController.show);
+router.post('/teacher', adminGate, teacherController.store);
 
 router.use(errorMiddleware.notFound);
 router.use(errorMiddleware.handle);
