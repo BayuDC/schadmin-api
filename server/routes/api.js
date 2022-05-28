@@ -3,6 +3,7 @@ const { validate } = require('express-validation');
 
 const authController = require('../controllers/auth');
 const subjectController = require('../controllers/subject');
+const teacherController = require('../controllers/teacher');
 
 const subjectValidation = require('../validations/subject');
 
@@ -28,6 +29,10 @@ router.get('/subject/:subjectId', subjectController.show);
 router.post('/subject', adminGate, validate(...subjectValidation), subjectController.store);
 router.put('/subject/:subjectId', adminGate, validate(...subjectValidation), subjectController.update);
 router.delete('/subject/:subjectId', adminGate, subjectController.delete);
+
+router.param('teacherId', teacherController.load);
+router.get('/teacher', teacherController.index);
+router.get('/teacher/:teacherId', teacherController.show);
 
 router.use(errorMiddleware.notFound);
 router.use(errorMiddleware.handle);
