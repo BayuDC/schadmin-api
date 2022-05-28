@@ -1,5 +1,8 @@
 const { ValidationError } = require('express-validation');
 
+module.exports.notFound = (req, res) => {
+    res.status(404).send();
+};
 module.exports.handle = (err, req, res, next) => {
     if (err instanceof ValidationError) {
         return res.status(err.statusCode).json({

@@ -29,6 +29,7 @@ router.post('/subject', adminGate, validate(...subjectValidation), subjectContro
 router.put('/subject/:subjectId', adminGate, validate(...subjectValidation), subjectController.update);
 router.delete('/subject/:subjectId', adminGate, subjectController.delete);
 
+router.use(errorMiddleware.notFound);
 router.use(errorMiddleware.handle);
 
 module.exports = router;
