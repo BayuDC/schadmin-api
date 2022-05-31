@@ -8,7 +8,7 @@ const secret = process.env.JWT_SECRET || 'a';
  * @param {import('express').NextFunction} next
  */
 const getToken = (req, res, next) => {
-    req.token = req.cookies.token || req.body.token || req.query.token;
+    req.token = req.headers.authorization?.split(' ')[1] || req.cookies.token || req.body.token || req.query.token;
     next();
 };
 /**
