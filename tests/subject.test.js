@@ -14,7 +14,7 @@ beforeEach(async () => {
     ).body.token;
     tokenTeacher = (
         await request(app).post('/api/auth/login').send({
-            username: 'admin',
+            username: 'teacher',
             password: 'password',
         })
     ).body.token;
@@ -23,23 +23,17 @@ beforeEach(async () => {
 describe('GET /api/subjects', () => {
     it('should return 200', async () => {
         const response = await request(app).get('/api/subjects').query({ token: tokenAdmin });
-
         expect(response.status).toBe(200);
         expect(response.body.subjects).toBeInstanceOf(Array);
     });
     it('should return 401', async () => {
         const response = await request(app).get('/api/subjects');
-
         expect(response.status).toBe(401);
-        expect(response.body).toEqual({
-            message: 'Unauthorized',
-        });
     });
 });
 describe('GET /api/subjects/:id', () => {
     it('should return 200', async () => {
         const response = await request(app).get('/api/subjects/1').query({ token: tokenAdmin });
-
         expect(response.status).toBe(200);
         expect(response.body.subject.id).toBeDefined();
         expect(response.body.subject.name).toBeDefined();
@@ -49,16 +43,13 @@ describe('GET /api/subjects/:id', () => {
 
         expect(response.status).toBe(404);
         expect(response.body).toEqual({
-            message: 'Not Found',
+            message: 'Subject not found',
         });
     });
     it('should return 401', async () => {
         const response = await request(app).get('/api/subjects/1');
 
         expect(response.status).toBe(401);
-        expect(response.body).toEqual({
-            message: 'Unauthorized',
-        });
     });
 });
 describe('POST /api/subjects', () => {
@@ -67,26 +58,18 @@ describe('POST /api/subjects', () => {
             name: 'Test',
         });
 
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(201);
         expect(response.body.subject.id).toBeDefined();
         expect(response.body.subject.name).toBe('Test');
         subjectId = response.body.subject.id;
     });
     it('should return 403', async () => {
         const response = await request(app).post('/api/subjects').query({ token: tokenTeacher });
-
         expect(response.status).toBe(403);
-        expect(response.body).toEqual({
-            message: 'Forbidden',
-        });
     });
     it('should return 401', async () => {
         const response = await request(app).post('/api/subjects');
-
         expect(response.status).toBe(401);
-        expect(response.body).toEqual({
-            message: 'Unauthorized',
-        });
     });
     it.todo('should return 400');
 });
@@ -103,21 +86,21 @@ describe('PUT /api/subjects/:id', () => {
         expect(response.body.subject.id).toBeDefined();
         expect(response.body.subject.name).toBe('Test2');
     });
+    it('should return 404', async () => {
+        const response = await request(app).put('/api/subjects/999').query({ token: tokenAdmin });
+
+        expect(response.status).toBe(404);
+        expect(response.body).toEqual({
+            message: 'Subject not found',
+        });
+    });
     it('should return 403', async () => {
         const response = await request(app).put('/api/subjects/1').query({ token: tokenTeacher });
-
         expect(response.status).toBe(403);
-        expect(response.body).toEqual({
-            message: 'Forbidden',
-        });
     });
     it('should return 401', async () => {
         const response = await request(app).put('/api/subjects/1');
-
         expect(response.status).toBe(401);
-        expect(response.body).toEqual({
-            message: 'Unauthorized',
-        });
     });
     it.todo('should return 400');
 });
@@ -128,23 +111,21 @@ describe('DELETE /api/subjects/:id', () => {
             .delete('/api/subjects/' + subjectId)
             .query({ token: tokenAdmin });
 
-        expect(response.status).toBe(200);
-        expect(response.body.message).toBe('Subject deleted');
+        expect(response.status).toBe(204);
+    });
+    it('should return 404', async () => {
+        const response = await request(app).delete('/api/subjects/999').query({ token: tokenAdmin });
+        expect(response.status).toBe(404);
+        expect(response.body).toEqual({
+            message: 'Subject not found',
+        });
     });
     it('should return 403', async () => {
         const response = await request(app).delete('/api/subjects/1').query({ token: tokenTeacher });
-
         expect(response.status).toBe(403);
-        expect(response.body).toEqual({
-            message: 'Forbidden',
-        });
     });
     it('should return 401', async () => {
         const response = await request(app).delete('/api/subjects/1');
-
         expect(response.status).toBe(401);
-        expect(response.body).toEqual({
-            message: 'Unauthorized',
-        });
     });
 });

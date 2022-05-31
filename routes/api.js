@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
 router.use(auth);
 
 router.use('/auth', authRouter);
-router.use('/subject', subjectRouter);
+router.use('/subjects', subjectRouter);
 router.use('/teacher', teacherRouter);
 
 router.use(errorMiddleware.notFound);
