@@ -15,7 +15,7 @@ router.use(auth);
 
 router.use('/auth', authRouter);
 router.use('/subjects', subjectRouter);
-router.use('/teacher', teacherRouter);
+router.use('/teachers', teacherRouter);
 
 router.use(errorMiddleware.notFound);
 router.use(errorMiddleware.handle);
