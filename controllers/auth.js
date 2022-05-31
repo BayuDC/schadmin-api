@@ -44,7 +44,7 @@ module.exports.login = async (req, res, next) => {
     const token = createToken(user);
 
     res.cookie('token', token, { httpOnly: true, maxAge: oneDay * 1000 });
-    res.status(201).json({
+    res.json({
         message: 'Login success',
         user,
         token,

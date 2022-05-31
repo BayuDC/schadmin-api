@@ -5,8 +5,10 @@
   "scripts": {
     "start": "node bin/www",
     "dev": "node -r dotenv/config bin/www",
+    "db": "npm run db:push && npm run db:seed",
     "db:push": "prisma db push --force-reset",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "test": "jest"
   },
   "author": "BayuDC",
   "repository": {
@@ -26,8 +28,11 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^7.1.0",
+    "@types/jest": "^27.5.1",
     "dotenv": "^16.0.1",
-    "prisma": "^3.14.0"
+    "jest": "^28.1.0",
+    "prisma": "^3.14.0",
+    "supertest": "^6.2.3"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
