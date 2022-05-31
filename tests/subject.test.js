@@ -71,7 +71,19 @@ describe('POST /api/subjects', () => {
         const response = await request(app).post('/api/subjects');
         expect(response.status).toBe(401);
     });
-    it.todo('should return 400');
+    it('should return 400', async () => {
+        const response = await request(app).post('/api/subjects').query({ token: tokenAdmin }).send({
+            name: '',
+        });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            message: 'Validation failed',
+            errors: {
+                name: 'Subject name is required',
+            },
+        });
+    });
 });
 describe('PUT /api/subjects/:id', () => {
     it('should return 200', async () => {
@@ -85,6 +97,22 @@ describe('PUT /api/subjects/:id', () => {
         expect(response.status).toBe(200);
         expect(response.body.subject.id).toBeDefined();
         expect(response.body.subject.name).toBe('Test2');
+    });
+    it('should return 400', async () => {
+        const response = await request(app)
+            .put('/api/subjects/' + subjectId)
+            .query({ token: tokenAdmin })
+            .send({
+                name: '',
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            message: 'Validation failed',
+            errors: {
+                name: 'Subject name is required',
+            },
+        });
     });
     it('should return 404', async () => {
         const response = await request(app).put('/api/subjects/999').query({ token: tokenAdmin });
@@ -102,7 +130,6 @@ describe('PUT /api/subjects/:id', () => {
         const response = await request(app).put('/api/subjects/1');
         expect(response.status).toBe(401);
     });
-    it.todo('should return 400');
 });
 
 describe('DELETE /api/subjects/:id', () => {

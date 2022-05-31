@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const { validate } = require('express-validation');
 
 const authRouter = require('./api/auth');
 const subjectRouter = require('./api/subject');

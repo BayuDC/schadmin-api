@@ -1,12 +1,8 @@
-const { Joi } = require('express-validation');
-const { options, joiOptions } = require('./config');
+const { body } = require('express-validator');
+const vallidate = require('./_validate');
 
 module.exports = [
-    {
-        body: Joi.object({
-            name: Joi.string().required(),
-        }),
-    },
-    options,
-    joiOptions,
+    body('name').notEmpty().withMessage('Subject name is required').isString().trim(),
+    vallidate,
+    //
 ];
