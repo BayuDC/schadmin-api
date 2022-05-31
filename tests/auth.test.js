@@ -5,7 +5,7 @@ let token;
 
 beforeEach(async () => {
     const response = await request(app).post('/api/auth/login').send({
-        username: 'administrator',
+        username: 'admin',
         password: 'password',
     });
 
@@ -15,13 +15,13 @@ beforeEach(async () => {
 describe('POST /api/auth/login', () => {
     it('should return 200', async () => {
         const response = await request(app).post('/api/auth/login').send({
-            username: 'administrator',
+            username: 'admin',
             password: 'password',
         });
 
         expect(response.status).toBe(200);
         expect(response.body.message).toBe('Login success');
-        expect(response.body.user.username).toBe('administrator');
+        expect(response.body.user.username).toBe('admin');
         expect(response.body.token).toBeDefined();
         expect(response.header['set-cookie']).toBeDefined();
         expect(response.header['set-cookie'][0]).toContain('token');
@@ -38,7 +38,7 @@ describe('POST /api/auth/login', () => {
     });
     it('should return 401', async () => {
         const response = await request(app).post('/api/auth/login').send({
-            username: 'administrator',
+            username: 'admin',
             password: 'incorrect',
         });
 
@@ -66,7 +66,7 @@ describe('GET /api/auth/me', () => {
         const response = await request(app).get('/api/auth/me').query({ token });
 
         expect(response.status).toBe(200);
-        expect(response.body.user.username).toBe('administrator');
+        expect(response.body.user.username).toBe('admin');
         expect(response.body.user.id).toBeDefined();
     });
 });

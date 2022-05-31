@@ -7,9 +7,16 @@ const password = '$2b$10$Hm3IPt5xdLKKr/8HfUHWxuemOpDZyikaDBtScq.1GsCTSEGqGTXry';
 async function main() {
     await prisma.user.create({
         data: {
-            username: 'administrator',
+            username: 'admin',
             password: password,
             role: 'admin',
+        },
+    });
+    await prisma.user.create({
+        data: {
+            username: 'teacher',
+            password: password,
+            role: 'teacher',
         },
     });
 
