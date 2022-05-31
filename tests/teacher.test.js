@@ -3,6 +3,7 @@ const app = require('../app');
 
 let tokenAdmin;
 let tokenTeacher;
+let teacherId;
 
 beforeEach(async () => {
     tokenAdmin = (
@@ -61,6 +62,33 @@ describe('GET /api/teachers/:id', () => {
     it('should return 401', async () => {
         const response = await request(app).get('/api/teachers/1');
 
+        expect(response.status).toBe(401);
+    });
+});
+describe('POST /api/teachers', () => {
+    it('should create a teacher', async () => {
+        const teacher = {
+            name: 'Teacher',
+            code: 'TT',
+            gender: 'male',
+            address: 'Some address',
+            userId: 2,
+            subjectId: 2,
+        };
+        const response = await request(app).post('/api/teachers').query({ token: tokenAdmin }).send(teacher);
+
+        expect(response.status).toBe(201);
+        expect(response.body.teacher).toHaveProperty('id');
+        expect(response.body.teacher).toMatchObject(teacher);
+
+        teacherId = response.body.teacher.id;
+    });
+    it('should return 403', async () => {
+        const response = await request(app).post('/api/teachers').query({ token: tokenTeacher });
+        expect(response.status).toBe(403);
+    });
+    it('should return 401', async () => {
+        const response = await request(app).post('/api/teachers');
         expect(response.status).toBe(401);
     });
 });
