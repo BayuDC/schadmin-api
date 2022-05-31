@@ -1,14 +1,12 @@
 const router = require('express').Router();
 const { validate } = require('express-validation');
 
-const authController = require('../controllers/auth');
-const subjectController = require('../controllers/subject');
-const teacherController = require('../controllers/teacher');
-
-const subjectValidation = require('../validations/subject');
+const authRouter = require('./api/auth');
+const subjectRouter = require('./api/subject');
+const teacherRouter = require('./api/teacher');
 
 const errorMiddleware = require('../middlewares/error');
-const { auth, authGuard, adminGate } = require('../middlewares/auth');
+const { auth } = require('../middlewares/auth');
 
 router.get('/', (req, res) => {
     res.json({ message: 'Hello World!' });
@@ -16,24 +14,9 @@ router.get('/', (req, res) => {
 
 router.use(auth);
 
-router.get('/auth', authGuard, (req, res) => res.send());
-router.get('/auth/me', authGuard, authController.me);
-router.post('/auth/login', authController.login);
-router.get('/auth/logout', authGuard, authController.logout);
-
-router.use(authGuard);
-
-router.param('subjectId', subjectController.load);
-router.get('/subject', subjectController.index);
-router.get('/subject/:subjectId', subjectController.show);
-router.post('/subject', adminGate, validate(...subjectValidation), subjectController.store);
-router.put('/subject/:subjectId', adminGate, validate(...subjectValidation), subjectController.update);
-router.delete('/subject/:subjectId', adminGate, subjectController.delete);
-
-router.param('teacherId', teacherController.load);
-router.get('/teacher', teacherController.index);
-router.get('/teacher/:teacherId', teacherController.show);
-router.post('/teacher', adminGate, teacherController.store);
+router.use('/auth', authRouter);
+router.use('/subject', subjectRouter);
+router.use('/teacher', teacherRouter);
 
 router.use(errorMiddleware.notFound);
 router.use(errorMiddleware.handle);
