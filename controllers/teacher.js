@@ -66,8 +66,8 @@ module.exports = {
             const teacher = await db.teacher.create({
                 data: {
                     ...{ name, code, gender, address },
-                    user: { connect: { id: parseInt(userId) } },
-                    subject: { connect: { id: parseInt(subjectId) } },
+                    user: { connect: { id: userId } },
+                    subject: { connect: { id: subjectId } },
                 },
             });
 

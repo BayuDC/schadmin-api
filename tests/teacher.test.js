@@ -92,3 +92,43 @@ describe('POST /api/teachers', () => {
         expect(response.status).toBe(401);
     });
 });
+describe('POST /api/teachers validation', () => {
+    it('need all fields', async () => {
+        const response = await request(app).post('/api/teachers').query({ token: tokenAdmin });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            message: 'Validation failed',
+            errors: {
+                name: 'Name is required',
+                code: 'Code is required',
+                gender: 'Gender is required',
+                address: 'Address is required',
+                subjectId: 'Subject is required',
+                userId: 'User is required',
+            },
+        });
+    });
+    it('need unique code', async () => {
+        const teacher = { code: 'TT' };
+        const response = await request(app).post('/api/teachers').query({ token: tokenAdmin }).send(teacher);
+
+        expect(response.status).toBe(400);
+        expect(response.body.errors).toHaveProperty('code', 'Code already taken');
+    });
+    it('need valid gender', async () => {
+        const teacher = { gender: 'notmaleorfemale' };
+        const response = await request(app).post('/api/teachers').query({ token: tokenAdmin }).send(teacher);
+
+        expect(response.status).toBe(400);
+        expect(response.body.errors).toHaveProperty('gender', 'Gender must be male or female');
+    });
+    it('need user and subject that exists', async () => {
+        const teacher = { subjectId: 999, userId: 999 };
+        const response = await request(app).post('/api/teachers').query({ token: tokenAdmin }).send(teacher);
+
+        expect(response.status).toBe(400);
+        expect(response.body.errors).toHaveProperty('subjectId', 'Subject not found');
+        expect(response.body.errors).toHaveProperty('userId', 'User not found');
+    });
+});
