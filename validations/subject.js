@@ -1,8 +1,7 @@
 const { body } = require('express-validator');
 const validate = require('./_validate');
 
-module.exports = [
+module.exports = validate([
     body('name').notEmpty().withMessage('Name is required').isString().trim(),
-    validate,
     //
-];
+]);
