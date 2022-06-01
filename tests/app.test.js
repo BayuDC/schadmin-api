@@ -1,9 +1,7 @@
 const request = require('supertest');
 const app = require('../app');
 
-beforeAll(() => {
-    require('dotenv').config();
-});
+beforeAll(() => require('dotenv').config());
 
 describe('GET /', () => {
     it('should return 200', async () => {
@@ -21,9 +19,7 @@ describe('GET /api', () => {
 
         expect(response.status).toBe(200);
         expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
-        expect(response.body).toEqual({
-            message: 'Hello World!',
-        });
+        expect(response.body).toEqual({ message: 'Hello World!' });
     });
 
     it('should return 404', async () => {
@@ -31,8 +27,6 @@ describe('GET /api', () => {
 
         expect(response.status).toBe(404);
         expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
-        expect(response.body).toEqual({
-            message: 'Not Found',
-        });
+        expect(response.body).toEqual({ message: 'Not Found' });
     });
 });

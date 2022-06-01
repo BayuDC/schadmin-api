@@ -5,7 +5,7 @@ let tokenAdmin;
 let tokenTeacher;
 let subjectId;
 
-beforeEach(async () => {
+beforeAll(async () => {
     tokenAdmin = (
         await request(app).post('/api/auth/login').send({
             username: 'admin',
@@ -19,140 +19,95 @@ beforeEach(async () => {
         })
     ).body.token;
 });
+describe('Normal state for /api/subjects', () => {
+    describe('get', () => {
+        it('should return all subjects', async () => {
+            const response = await request(app).get('/api/subjects').query({ token: tokenAdmin });
 
-describe('GET /api/subjects', () => {
-    it('should return 200', async () => {
-        const response = await request(app).get('/api/subjects').query({ token: tokenAdmin });
-        expect(response.status).toBe(200);
-        expect(response.body.subjects).toBeInstanceOf(Array);
-    });
-    it('should return 401', async () => {
-        const response = await request(app).get('/api/subjects');
-        expect(response.status).toBe(401);
-    });
-});
-describe('GET /api/subjects/:id', () => {
-    it('should return 200', async () => {
-        const response = await request(app).get('/api/subjects/1').query({ token: tokenAdmin });
-        expect(response.status).toBe(200);
-        expect(response.body.subject.id).toBeDefined();
-        expect(response.body.subject.name).toBeDefined();
-    });
-    it('should return 404', async () => {
-        const response = await request(app).get('/api/subjects/999').query({ token: tokenAdmin });
+            expect(response.status).toBe(200);
+            expect(response.body.subjects).toBeInstanceOf(Array);
+            expect(response.body.subjects[0].name).toBeDefined();
+            expect(response.body.subjects[1].name).toBeDefined();
+        });
+        it('should return a subject', async () => {
+            const response = await request(app).get('/api/subjects/1').query({ token: tokenAdmin });
 
-        expect(response.status).toBe(404);
-        expect(response.body).toEqual({
-            message: 'Subject not found',
+            expect(response.status).toBe(200);
+            expect(response.body.subject.id).toBeDefined();
+            expect(response.body.subject.name).toBeDefined();
         });
     });
-    it('should return 401', async () => {
-        const response = await request(app).get('/api/subjects/1');
+    describe('post', () => {
+        it('should create a subject', async () => {
+            const subject = { name: 'Test' };
+            const response = await request(app).post('/api/subjects').query({ token: tokenAdmin }).send(subject);
 
-        expect(response.status).toBe(401);
+            expect(response.status).toBe(201);
+            expect(response.body.subject).toMatchObject(subject);
+            expect(response.body.subject.id).toBeDefined();
+            subjectId = response.body.subject.id;
+        });
+    });
+    describe('put', () => {
+        it('should update a subject', async () => {
+            const subject = { name: 'Test Edited' };
+            const response = await request(app)
+                .put(`/api/subjects/${subjectId}`)
+                .query({ token: tokenAdmin })
+                .send(subject);
+
+            expect(response.status).toBe(200);
+            expect(response.body.subject).toMatchObject(subject);
+            expect(response.body.subject.id).toBeDefined();
+        });
+    });
+    describe('delete', () => {
+        it('should delete a subject', async () => {
+            const response = await request(app).delete(`/api/subjects/${subjectId}`).query({ token: tokenAdmin });
+
+            expect(response.status).toBe(204);
+        });
     });
 });
-describe('POST /api/subjects', () => {
-    it('should return 200', async () => {
-        const response = await request(app).post('/api/subjects').query({ token: tokenAdmin }).send({
-            name: 'Test',
-        });
 
-        expect(response.status).toBe(201);
-        expect(response.body.subject.id).toBeDefined();
-        expect(response.body.subject.name).toBe('Test');
-        subjectId = response.body.subject.id;
-    });
-    it('should return 403', async () => {
-        const response = await request(app).post('/api/subjects').query({ token: tokenTeacher });
+describe('Error handling for /api/subjects', () => {
+    it.each(
+        ['get', 'post', 'put', 'delete'],
+        'should return a 401 error if the user is not authenticated',
+        async method => {
+            const response = await request(app)[method]('/api/subjects');
+
+            expect(response.status).toBe(401);
+        }
+    );
+    it.each(['post', 'put', 'delete'], 'should return a 403 error if the user is not authorized', async method => {
+        const response = await request(app)[method]('/api/subjects').query({ token: tokenTeacher });
+
         expect(response.status).toBe(403);
     });
-    it('should return 401', async () => {
-        const response = await request(app).post('/api/subjects');
-        expect(response.status).toBe(401);
-    });
-    it('should return 400', async () => {
-        const response = await request(app).post('/api/subjects').query({ token: tokenAdmin }).send({
-            name: '',
-        });
-
-        expect(response.status).toBe(400);
-        expect(response.body).toEqual({
-            message: 'Validation failed',
-            errors: {
-                name: 'Subject name is required',
-            },
-        });
-    });
-});
-describe('PUT /api/subjects/:id', () => {
-    it('should return 200', async () => {
-        const response = await request(app)
-            .put('/api/subjects/' + subjectId)
-            .query({ token: tokenAdmin })
-            .send({
-                name: 'Test2',
-            });
-
-        expect(response.status).toBe(200);
-        expect(response.body.subject.id).toBeDefined();
-        expect(response.body.subject.name).toBe('Test2');
-    });
-    it('should return 400', async () => {
-        const response = await request(app)
-            .put('/api/subjects/' + subjectId)
-            .query({ token: tokenAdmin })
-            .send({
-                name: '',
-            });
-
-        expect(response.status).toBe(400);
-        expect(response.body).toEqual({
-            message: 'Validation failed',
-            errors: {
-                name: 'Subject name is required',
-            },
-        });
-    });
-    it('should return 404', async () => {
-        const response = await request(app).put('/api/subjects/999').query({ token: tokenAdmin });
+    it.each(['get', 'put', 'delete'], 'should return a 404 error if the subject does not exist', async method => {
+        const response = await request(app)[method](`/api/subjects/0`).query({ token: tokenAdmin });
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({
-            message: 'Subject not found',
-        });
-    });
-    it('should return 403', async () => {
-        const response = await request(app).put('/api/subjects/1').query({ token: tokenTeacher });
-        expect(response.status).toBe(403);
-    });
-    it('should return 401', async () => {
-        const response = await request(app).put('/api/subjects/1');
-        expect(response.status).toBe(401);
     });
 });
+describe('Validation for /api/subjects', () => {
+    describe('post', () => {
+        it('need a name', async () => {
+            const response = await request(app).post('/api/subjects').query({ token: tokenAdmin }).send({});
 
-describe('DELETE /api/subjects/:id', () => {
-    it('should return 200', async () => {
-        const response = await request(app)
-            .delete('/api/subjects/' + subjectId)
-            .query({ token: tokenAdmin });
-
-        expect(response.status).toBe(204);
-    });
-    it('should return 404', async () => {
-        const response = await request(app).delete('/api/subjects/999').query({ token: tokenAdmin });
-        expect(response.status).toBe(404);
-        expect(response.body).toEqual({
-            message: 'Subject not found',
+            expect(response.status).toBe(400);
+            expect(response.body.message).toBe('Validation failed');
+            expect(response.body.errors.name).toBe('Name is required');
         });
     });
-    it('should return 403', async () => {
-        const response = await request(app).delete('/api/subjects/1').query({ token: tokenTeacher });
-        expect(response.status).toBe(403);
-    });
-    it('should return 401', async () => {
-        const response = await request(app).delete('/api/subjects/1');
-        expect(response.status).toBe(401);
+    describe('put', () => {
+        it('need a name', async () => {
+            const response = await request(app).put(`/api/subjects/1`).query({ token: tokenAdmin }).send({});
+
+            expect(response.status).toBe(400);
+            expect(response.body.message).toBe('Validation failed');
+            expect(response.body.errors.name).toBe('Name is required');
+        });
     });
 });
