@@ -71,25 +71,32 @@ describe('Normal state for /api/subjects', () => {
 });
 
 describe('Error handling for /api/subjects', () => {
-    it.each(
-        ['get', 'post', 'put', 'delete'],
-        'should return a 401 error if the user is not authenticated',
+    it.each(['get', 'post', 'put', 'delete'])(
+        'should return a 401 error if the user is not authenticated for %s',
         async method => {
             const response = await request(app)[method]('/api/subjects');
 
             expect(response.status).toBe(401);
         }
     );
-    it.each(['post', 'put', 'delete'], 'should return a 403 error if the user is not authorized', async method => {
-        const response = await request(app)[method]('/api/subjects').query({ token: tokenTeacher });
+    it.each(['post', 'put', 'delete'])(
+        'should return a 403 error if the user is not authorized for %s',
+        async method => {
+            const response = await request(app)
+                [method]('/api/subjects/' + (method == 'post' ? '' : 1))
+                .query({ token: tokenTeacher });
 
-        expect(response.status).toBe(403);
-    });
-    it.each(['get', 'put', 'delete'], 'should return a 404 error if the subject does not exist', async method => {
-        const response = await request(app)[method](`/api/subjects/0`).query({ token: tokenAdmin });
+            expect(response.status).toBe(403);
+        }
+    );
+    it.each(['get', 'put', 'delete'])(
+        'should return a 404 error if the subject does not exist for %s',
+        async method => {
+            const response = await request(app)[method](`/api/subjects/0`).query({ token: tokenAdmin });
 
-        expect(response.status).toBe(404);
-    });
+            expect(response.status).toBe(404);
+        }
+    );
 });
 describe('Validation for /api/subjects', () => {
     describe('post', () => {

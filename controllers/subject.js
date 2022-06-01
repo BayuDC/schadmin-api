@@ -84,7 +84,7 @@ module.exports = {
      * @param {import('express').Response} res
      * @param {import('express').NextFunction} next
      */
-    delete: async (req, res, next) => {
+    destroy: async (req, res, next) => {
         try {
             await db.subject.delete({
                 where: { id: req.subject.id },

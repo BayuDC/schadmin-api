@@ -66,12 +66,55 @@ module.exports = {
             const teacher = await db.teacher.create({
                 data: {
                     ...{ name, code, gender, address },
-                    user: { connect: { id: userId } },
-                    subject: { connect: { id: subjectId } },
+                    user: { connect: { id: parseInt(userId) } },
+                    subject: { connect: { id: parseInt(subjectId) } },
                 },
             });
 
             res.status(201).json({ teacher });
+        } catch (err) {
+            next(createError(400, err.message));
+        }
+    },
+
+    /**
+     * @param {import('express').Request} req
+     * @param {import('express').Response} res
+     * @param {import('express').NextFunction} next
+     */
+    async update(req, res, next) {
+        try {
+            const { name, code, gender, address, userId, subjectId } = req.body;
+            const teacher = await db.teacher.update({
+                where: { id: req.teacher.id },
+                data: {
+                    name,
+                    code,
+                    gender,
+                    address,
+                    userId: parseInt(userId),
+                    subjectId: parseInt(subjectId),
+                },
+            });
+
+            res.json({ teacher });
+        } catch (err) {
+            console.log(err.message);
+            next(createError(400, err.message));
+        }
+    },
+    /**
+     * @param {import('express').Request} req
+     * @param {import('express').Response} res
+     * @param {import('express').NextFunction} next
+     */
+    async destroy(req, res, next) {
+        try {
+            await db.teacher.delete({
+                where: { id: req.teacher.id },
+            });
+
+            res.status(204).send();
         } catch (err) {
             next(createError(400, err.message));
         }
